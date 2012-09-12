@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/balloon_main_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/balloon_overlay_bg_selector"
+    android:minWidth="100dip"
+    android:orientation="horizontal"
+    android:paddingBottom="25dip"
+    android:paddingLeft="10dip"
+    android:paddingRight="0dip"
+    android:paddingTop="0dip" >
+
+    <LinearLayout
+        android:id="@+id/balloon_inner_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-10dip"
+        android:layout_marginTop="1dip"
+        android:layout_weight="1" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:minHeight="25dip"
+            android:minWidth="150dp"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+               
+                android:layout_marginRight="3dp"
+                android:layout_toRightOf="@+id/balloon_image"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/balloon_item_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:text="balloon_item_title"
+                    android:textColor="#000000"
+                    android:textSize="14dip" />
+
+                <TextView
+                    android:id="@+id/balloon_item_snippet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/balloon_item_title"
+                    android:layout_below="@+id/balloon_item_title"
+                    android:text="balloon_item_snippet"
+                    android:textColor="#000000"
+                    android:textSize="10dip" />
+            </LinearLayout>
+            
+            
+        </RelativeLayout>
+
+      
+    </LinearLayout>
+
+</LinearLayout>
