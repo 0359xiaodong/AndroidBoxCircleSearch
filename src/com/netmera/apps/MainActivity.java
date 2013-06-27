@@ -11,7 +11,6 @@ import com.netmera.overlays.BalloonItemizedOverlay;
 import android.os.Bundle;
 import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -96,31 +95,33 @@ public class MainActivity extends MapActivity {
 		
 		NetmeraService service = new NetmeraService("Points");
 		service.boxSearchInBackground(topleft, bottomright, "location", new NetmeraCallback< List< NetmeraContent>>() {
-		    
-		    public void callback(List< NetmeraContent> contentList, NetmeraException exception) {
-		        if (contentList != null && exception == null) {
-		            // Success
-		            for (NetmeraContent content : contentList) {
-		                try {
-		                    NetmeraGeoLocation geo = content.getNetmeraGeoLocation("location");
-		                    double latitude = geo.getLatitude();
-		                    double longitude = geo.getLongitude();
-		                    String title=content.getString("title");
-		                    GeoPoint geopoint = new GeoPoint((int) (latitude * 1e6), (int) (longitude * 1e6));
-		                    draw(geopoint, title);
-		                    
-		                    
-		                    
-		                } catch (NetmeraException e) {
-		                    // Handle exception
-		                }
-		            }
-		        } else {
-		            // Error occurred.
-		        }   
-		        mDialog.dismiss();
+		   
+			@Override
+			public void onSuccess(List<NetmeraContent> result) {
+				// Success
+	            for (NetmeraContent content : result) {
+	                try {
+	                    NetmeraGeoLocation geo = content.getNetmeraGeoLocation("location");
+	                    double latitude = geo.getLatitude();
+	                    double longitude = geo.getLongitude();
+	                    String title=content.getString("title");
+	                    GeoPoint geopoint = new GeoPoint((int) (latitude * 1e6), (int) (longitude * 1e6));
+	                    draw(geopoint, title);
+	                    
+	                    
+	                    
+	                } catch (NetmeraException e) {
+	                    // Handle exception
+	                }
+	            }
+	            mDialog.dismiss();
 		        mapView.postInvalidate();
-		    }
+			}
+			 
+			@Override
+			public void onFail(NetmeraException exception) {
+				// Handle exception
+			}
 		});
 		
 		
@@ -132,37 +133,43 @@ public class MainActivity extends MapActivity {
 		mDialog.show();
 		pointsOverlay.hideAllBalloons();
 		centerofIstanbulOverlay.hideAllBalloons();
-		NetmeraGeoLocation netmeraGeoLocationofIstanbul = new NetmeraGeoLocation(Constants.latitudeofIstanbul, Constants.longitudeofIstanbul);
+		NetmeraGeoLocation netmeraGeoLocationofIstanbul = null;
+		try {
+			netmeraGeoLocationofIstanbul = new NetmeraGeoLocation(Constants.latitudeofIstanbul, Constants.longitudeofIstanbul);
+		} catch (NetmeraException e1) {
+			e1.printStackTrace();
+		}
 
 		
 		NetmeraService service = new NetmeraService("Points");
 		int distance=3;
 		service.circleSearchInBackground(netmeraGeoLocationofIstanbul, distance, "location", new NetmeraCallback< List< NetmeraContent>>() {
-		   
-		    public void callback(List< NetmeraContent> contentList, NetmeraException exception) {
-		        if (contentList != null && exception == null) {
-		            // Success
-		            for (NetmeraContent content : contentList) {
-		                try {
-		                    NetmeraGeoLocation geo = content.getNetmeraGeoLocation("location");
-		                    double latitude = geo.getLatitude();
-		                    double longitude = geo.getLongitude();
-		                    
-		                    String title=content.getString("title");
-		                    GeoPoint geopoint = new GeoPoint((int) (latitude * 1e6), (int) (longitude * 1e6));
-		                    draw(geopoint, title);
-		                    
-		                    
-		                } catch (NetmeraException e) {
-		                    // Handle exception
-		                }
-		            }
-		        } else {
-		            // Error occurred.
-		        }        
-		        mDialog.dismiss();
+
+			@Override
+			public void onSuccess(List<NetmeraContent> result) {
+				 // Success
+	            for (NetmeraContent content : result) {
+	                try {
+	                    NetmeraGeoLocation geo = content.getNetmeraGeoLocation("location");
+	                    double latitude = geo.getLatitude();
+	                    double longitude = geo.getLongitude();
+	                    
+	                    String title=content.getString("title");
+	                    GeoPoint geopoint = new GeoPoint((int) (latitude * 1e6), (int) (longitude * 1e6));
+	                    draw(geopoint, title);
+	                    
+	                } catch (NetmeraException e) {
+	                    // Handle exception
+	                }
+	            }
+	            mDialog.dismiss();
 		        mapView.postInvalidate();
-		    }
+			}
+			
+			@Override
+			public void onFail(NetmeraException exception) {
+				 // Error occurred.
+			}
 		});
 	
 
@@ -193,7 +200,7 @@ public class MainActivity extends MapActivity {
 
 	public NetmeraGeoLocation[] getmapcoordinates() {
 		NetmeraGeoLocation[] coordinates = new NetmeraGeoLocation[2];
-		NetmeraGeoLocation maptopleft, mapbottomright;
+		NetmeraGeoLocation maptopleft = null, mapbottomright = null;
 		Projection proj = mapView.getProjection();
 		GeoPoint topLeft = proj.fromPixels(0, 0);
 		GeoPoint bottomRight = proj.fromPixels(mapView.getWidth() - 10, mapView.getHeight() - 10);
@@ -201,8 +208,12 @@ public class MainActivity extends MapActivity {
 		double topLon = topLeft.getLongitudeE6() / 1E6;
 		double bottomLat = bottomRight.getLatitudeE6() / 1E6;
 		double bottomLon = bottomRight.getLongitudeE6() / 1E6;
-		maptopleft = new NetmeraGeoLocation(topLat, topLon);
-		mapbottomright = new NetmeraGeoLocation(bottomLat, bottomLon);
+		try {
+			maptopleft = new NetmeraGeoLocation(topLat, topLon);
+			mapbottomright = new NetmeraGeoLocation(bottomLat, bottomLon);
+		} catch (NetmeraException e) {
+			e.printStackTrace();
+		}
 
 		coordinates[0] = maptopleft;
 		coordinates[1] = mapbottomright;
@@ -221,7 +232,11 @@ public class MainActivity extends MapActivity {
 		marker = getResources().getDrawable(R.drawable.mapmarker);
 		markercenter = getResources().getDrawable(R.drawable.redmarker);
 		geoLocationofIstanbul = new GeoPoint((int) (Constants.latitudeofIstanbul * 1E6), (int) (Constants.longitudeofIstanbul * 1E6));
-		netmeraGeoLocationofIstanbul = new NetmeraGeoLocation(Constants.latitudeofIstanbul, Constants.longitudeofIstanbul);
+		try {
+			netmeraGeoLocationofIstanbul = new NetmeraGeoLocation(Constants.latitudeofIstanbul, Constants.longitudeofIstanbul);
+		} catch (NetmeraException e) {
+			e.printStackTrace();
+		}
 		mDialog = new ProgressDialog(MainActivity.this);
 		mDialog.setMessage("Loading...");
 		mDialog.setCancelable(false);
